@@ -74,6 +74,44 @@ With Mau, you can deploy your application in just a few clicks, allowing you to 
 ## Example
 
 ```js
+
+import { DataSource } from 'typeorm';
+
+const datasource = new DataSource({
+  type: 'mariadb',
+  logging: true,
+  replication: {
+    master: {
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: 'rootpassword',
+      database: 'exampledb',
+    },
+    slaves: [
+      {
+        host: 'localhost',
+        port: 3307,
+        username: 'root',
+        password: 'rootpassword',
+        database: 'exampledb',
+      },
+    ],
+  },
+});
+export default datasource;
+
+import datasource from './databaseSource';
+
+private sleep(seconds: number) {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, seconds);
+    });
+  }
+
+
 async getUsers() {
     await datasource.initialize();
     const masterQueryRunner = datasource.createQueryRunner('master');
