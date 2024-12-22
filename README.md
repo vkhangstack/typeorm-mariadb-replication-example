@@ -71,6 +71,39 @@ $ mau deploy
 
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 
+## Example
+
+```js
+async getUsers() {
+    await datasource.initialize();
+    const masterQueryRunner = datasource.createQueryRunner('master');
+
+    const slaveQueryRunner = datasource.createQueryRunner('slave');
+    try {
+      const id = crypto.randomUUID();
+      const newUser = await masterQueryRunner.query(
+        `INSERT INTO users(id, name) VALUES (?,?)`,
+        [id, crypto.randomUUID().replaceAll('-', '')],
+      );
+      console.log('newUser', newUser.affectedRows);
+
+      await this.sleep(1000);
+
+      const user = await slaveQueryRunner.query(
+        'SELECT * FROM users where id = ?',
+        [id],
+      );
+      return user;
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      await slaveQueryRunner.release();
+      await datasource.destroy();
+    }
+  }
+
+```
+
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:
