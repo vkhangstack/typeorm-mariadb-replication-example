@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  mariadb-master:
+    image: mariadb:11.6
+    container_name: mariadb-master
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - master_data:/var/lib/mysql
+      - ./master-my.cnf:/etc/mysql/my.cnf
+    command: --server-id=1 --log-bin=mysql-bin
+
+  mariadb-slave:
+    image: mariadb:11.6
+    container_name: mariadb-slave
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "3307:3306"
+    depends_on:
+      - mariadb-master
+    volumes:
+      - slave_data:/var/lib/mysql
+      - ./slave-my.cnf:/etc/mysql/my.cnf
+    command: --server-id=2 --relay-log=mysql-relay-bin --read-only=1
+
+volumes:
+  master_data:
+  slave_data:
