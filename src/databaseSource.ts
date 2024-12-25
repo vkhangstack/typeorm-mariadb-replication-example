@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 const datasource = new DataSource({
   type: 'mariadb',
   logging: true,
+  subscribers: [],
   replication: {
     master: {
       host: 'localhost',
